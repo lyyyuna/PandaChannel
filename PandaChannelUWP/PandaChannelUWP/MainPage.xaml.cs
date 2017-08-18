@@ -12,6 +12,8 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Windows.UI.Popups;
+using Microsoft.Toolkit.Uwp.UI.Controls;
 
 // https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x804 上介绍了“空白页”项模板
 
@@ -22,9 +24,35 @@ namespace PandaChannelUWP
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        private string currentLabel = "";
         public MainPage()
         {
             this.InitializeComponent();
+
+            contentFrame.Navigate(typeof(Views.PandaLive));
+        }
+
+        private  void HamburgerMenu_OnItemClick(object sender, ItemClickEventArgs e)
+        {
+            var menuItem = e.ClickedItem as HamburgerMenuItem;
+
+            if (menuItem.Label == "熊猫直播" && currentLabel != "熊猫直播")
+            {
+                contentFrame.Navigate(typeof(Views.PandaLive));
+                currentLabel = "熊猫直播";
+            }
+            if (menuItem.Label == "高清趣图" && currentLabel != "高清趣图")
+            {
+                contentFrame.Navigate(typeof(Views.Album));
+                currentLabel = "高清趣图";
+            }
+        }
+
+        private async void HamburgerMenu_OnOptionsItemClick(object sender, ItemClickEventArgs e)
+        {
+            var menuItem = e.ClickedItem as HamburgerMenuItem;
+            var dialog = new MessageDialog($"You clicked on {menuItem.Label} button");
+            await dialog.ShowAsync();
         }
     }
 }
