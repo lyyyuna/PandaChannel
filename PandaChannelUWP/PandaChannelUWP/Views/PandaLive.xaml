@@ -8,7 +8,6 @@
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <MediaElement Source="http://ipanda.vtime.cntv.cloudcdn.net:8000/live/flv/channel54?AUTH=UKwX28cOnr28qhXmqEM4b2BBaNTh/iAjtgZ97gIO3b+LeNMsOFoEe/cDB04h6m0aeILp23Qd4Iq98CVtMxxlPg==" 
-                      AutoPlay="True" />
+        <MediaElement Name="pandaTVElement" />
     </Grid>
 </Page>

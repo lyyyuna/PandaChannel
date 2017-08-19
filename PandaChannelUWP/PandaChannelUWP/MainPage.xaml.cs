@@ -30,6 +30,7 @@ namespace PandaChannelUWP
             this.InitializeComponent();
 
             contentFrame.Navigate(typeof(Views.PandaLive));
+            currentLabel = "熊猫直播";
         }
 
         private  void HamburgerMenu_OnItemClick(object sender, ItemClickEventArgs e)
