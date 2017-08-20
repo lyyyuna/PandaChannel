@@ -9,5 +9,12 @@
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <MediaElement Name="pandaTVElement" />
+        <Button Name="Refresh"
+                Click="Refresh_Click"
+                Visibility="Collapsed"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center">
+            <TextBlock Text="点击刷新"/>
+        </Button>
     </Grid>
 </Page>

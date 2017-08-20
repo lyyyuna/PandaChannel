@@ -49,11 +49,9 @@ namespace PandaChannelUWP
             }
         }
 
-        private async void HamburgerMenu_OnOptionsItemClick(object sender, ItemClickEventArgs e)
+        private void HamburgerMenu_OnOptionsItemClick(object sender, ItemClickEventArgs e)
         {
-            var menuItem = e.ClickedItem as HamburgerMenuItem;
-            var dialog = new MessageDialog($"You clicked on {menuItem.Label} button");
-            await dialog.ShowAsync();
+            contentFrame.Navigate(typeof(Views.About));
         }
     }
 }

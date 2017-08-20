@@ -16,7 +16,7 @@
                 <DataTemplate x:DataType="local:Photo">
                     <StackPanel Margin="0,8">
                         <Image Source="{x:Bind Cover}"/>
-                        <TextBlock Text="{x:Bind Title}"/>
+                        <TextBlock Text="{x:Bind Title}" FontSize="17" TextWrapping="Wrap"/>
                     </StackPanel>
                 </DataTemplate>
             </controls:MasterDetailsView.ItemTemplate>
@@ -26,7 +26,7 @@
                         BorderBrush="White" 
                         HorizontalAlignment="Left" 
                         VerticalAlignment="Bottom"
-                        ItemsSource="{Binding Urls}">
+                        ItemsSource="{x:Bind Urls}">
                         <FlipView.ItemTemplate>
                             <DataTemplate>
                                 <Image Source="{Binding}" />
@@ -39,14 +39,14 @@
                 <CommandBar>
                     <AppBarButton Name="sd1"
                                   Icon="RepeatOne" 
-                                  Label="Refresh" 
+                                  Label="刷新" 
                                   Click="AppBarButton_Click"/>
                 </CommandBar>
             </controls:MasterDetailsView.MasterCommandBar>
             <controls:MasterDetailsView.NoSelectionContentTemplate>
                 <DataTemplate>
                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <SymbolIcon Symbol="Mail" RenderTransformOrigin=".5,.5">
+                        <SymbolIcon Symbol="Camera"  RenderTransformOrigin=".5,.5">
                             <SymbolIcon.RenderTransform>
                                 <CompositeTransform ScaleX="2" ScaleY="2"/>
                             </SymbolIcon.RenderTransform>

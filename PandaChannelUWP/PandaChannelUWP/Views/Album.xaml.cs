@@ -16,6 +16,10 @@ using Windows.UI.Xaml.Navigation;
 using Microsoft.Toolkit.Uwp;
 using System.Threading.Tasks;
 using System.Threading;
+using Windows.UI.Popups;
+using Windows.Web.Http;
+using Newtonsoft.Json.Linq;
+using System.Text;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
 
@@ -27,52 +31,25 @@ namespace PandaChannelUWP.Views
     /// </summary>
     public sealed partial class Album : Page
     {
-        //private ObservableCollection<Photo> photos { get; set; }
         IncrementalLoadingCollection<PhotosSource, Photo> photos { get; set; }
 
         public Album()
         {
-            //photos = new ObservableCollection<Photo>();
             photos = new IncrementalLoadingCollection<PhotosSource, Photo>();
             this.InitializeComponent();
-            getBatchPhotos();
-        }
-
-        private void getBatchPhotos()
-        {/*
-            var items = new List<Photo>();
-            var item = new Photo();
-            item.Cover = "http://p1.img.cctvpic.com/photoworkspace/2017/08/16/2017081617324770369.jpg";
-            item.Title = "【图集】盼盼园雨后凉爽的日子";
-            item.Urls = new List<string>();
-            item.Urls.Add("http://p1.img.cctvpic.com/photoAlbum/photo/2017/08/16/PHOT0C06M1ytVixCnrgULuat170816_920x700.jpg");
-            item.Urls.Add("http://p1.img.cctvpic.com/photoAlbum/photo/2017/08/16/PHOTAg74o7xG45vs7aj0Bh0m170816_920x700.jpg");
-
-            items.Add(item);
-            items.ForEach(p => photos.Add(p));*/
         }
 
         private void AppBarButton_Click(object sender, RoutedEventArgs e)
-        {/*
-            var items = new List<Photo>();
-            var item = new Photo();
-            item.Cover = "http://p1.img.cctvpic.com/photoworkspace/2017/08/14/2017081415204475204.jpg";
-            item.Title = "【图集】大熊猫“福豹”盛大的生日会";
-            item.Urls = new List<string>();
-            item.Urls.Add("http://p1.img.cctvpic.com/photoAlbum/photo/2017/08/14/PHOThPZwbCjxOD4s4WOrR2Hh170814_920x700.jpg");
-            item.Urls.Add("http://p1.img.cctvpic.com/photoAlbum/photo/2017/08/14/PHOTh3CKb5BcDQLKXlH8qPbk170814_920x700.jpg");
-            photos.Clear();
-            items.Add(item);
-            items.ForEach(p => photos.Add(p));*/
-            photos.Clear();
+        {
+            photos.RefreshAsync();
         }
     }
 
     public class Photo
     {
-        public string Cover { get; set; }
+        public String Cover { get; set; }
 
-        public string Title { get; set; }
+        public String Title { get; set; }
 
         public List<String> Urls { get; set; }
     }
@@ -84,37 +61,77 @@ namespace PandaChannelUWP.Views
         public PhotosSource()
         {
             photos = new List<Photo>();
-            var p = new Photo { Cover = "http://p1.img.cctvpic.com/photoworkspace/2017/08/16/2017081617324770369.jpg", Title = "【图集】盼盼园雨后凉爽的日子" + 1 };
-            p.Urls = new List<string>();
-            p.Urls.Add("http://p1.img.cctvpic.com/photoAlbum/photo/2017/08/16/PHOT0C06M1ytVixCnrgULuat170816_920x700.jpg");
-            p.Urls.Add("http://p1.img.cctvpic.com/photoAlbum/photo/2017/08/16/PHOTAg74o7xG45vs7aj0Bh0m170816_920x700.jpg");
-            photos.Add(p);
         }
 
 
         public async Task<IEnumerable<Photo>> GetPagedItemsAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default(CancellationToken))
         {
-            // Gets items from the collection according to pageIndex and pageSize parameters.
-            /*var result = (from p in photos
-                          select p).Skip(pageIndex * pageSize).Take(pageSize);
-
-            // Simulates a longer request...
-            await Task.Delay(1000);*/
-
             var photos = new List<Photo>();
-            var item = new Photo();
+            /*var item = new Photo();
             item.Cover = "http://p1.img.cctvpic.com/photoworkspace/2017/08/14/2017081415204475204.jpg";
             item.Title = "【图集】大熊猫“福豹”盛大的生日会";
             item.Urls = new List<string>();
             item.Urls.Add("http://p1.img.cctvpic.com/photoAlbum/photo/2017/08/14/PHOThPZwbCjxOD4s4WOrR2Hh170814_920x700.jpg");
             item.Urls.Add("http://p1.img.cctvpic.com/photoAlbum/photo/2017/08/14/PHOTh3CKb5BcDQLKXlH8qPbk170814_920x700.jpg");
-            photos.Add(item);
-            
+            photos.Add(item);*/
+            var httpClient = new HttpClient();
+            var requestStr = "http://192.168.1.224:8000/news/photos?page="  + (pageIndex+1);
+            var requestUri = new Uri(requestStr);
+
+            try
+            {
+                //var httpClient = new HttpClient();
+                var httpResponse = await httpClient.GetAsync(requestUri);
+
+                if (httpResponse.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return photos;
+                }
+
+                //httpResponse.EnsureSuccessStatusCode();
+                var bytes = await httpResponse.Content.ReadAsBufferAsync();
+                var properEncodedString = Encoding.UTF8.GetString(bytes.ToArray());
+
+                JObject res = JObject.Parse(properEncodedString);
+                var results = res["results"].Children().ToList();
+                var serverResults = new List<ServerResult>();
+                foreach (var result in results)
+                {
+                    ServerResult serverResult = result.ToObject<ServerResult>();
+                    serverResults.Add(serverResult);
+                }
+
+                foreach (var result in serverResults)
+                {
+                    var item = new Photo();
+                    item.Cover = result.cover;
+                    item.Title = result.title;
+                    var imgurls = result.imgurls.Split(' ');
+                    item.Urls = new List<string>();
+                    foreach (var url in imgurls)
+                    {
+                        if (url.Length > 10)
+                            item.Urls.Add(url);
+                    }
+                    photos.Add(item);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                var dialog = new MessageDialog("发生网络错误。若重复出现，联系作者修复。");
+                await dialog.ShowAsync();
+            }
 
             return photos;
         }
 
-
+        public class ServerResult
+        {
+            public string title { get; set; }
+            public string cover { get; set; }
+            public string imgurls { get; set; }
+        }
     }
 
 }

@@ -16,6 +16,7 @@ using Windows.Web.Http;
 using Newtonsoft;
 using Newtonsoft.Json.Linq;
 using Windows.UI.Popups;
+using System.Threading.Tasks;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
 
@@ -39,7 +40,16 @@ namespace PandaChannelUWP.Views
             try
             {
                 var httpResponse = await httpClient.GetAsync(requestUri);
-                httpResponse.EnsureSuccessStatusCode();
+                for (int i = 0; i < 3; i++)
+                {
+                    if (httpResponse.StatusCode == HttpStatusCode.Found)
+                    {
+                        break;
+                    }
+                    await Task.Delay(1000);
+                    httpResponse = await httpClient.GetAsync(requestUri);
+                }
+
                 var httpResponseBody = await httpResponse.Content.ReadAsStringAsync();
                 httpResponseBody = httpResponseBody.Substring(20);
                 httpResponseBody = httpResponseBody.Substring(0, httpResponseBody.Length - 36);
@@ -52,9 +62,16 @@ namespace PandaChannelUWP.Views
             }
             catch (Exception ex)
             {
-                var dialog = new MessageDialog("获取直播链接失败。若重复出现，联系作者修复。");
+                Refresh.Visibility = Visibility.Visible;
+                var dialog = new MessageDialog("获取直播链接失败，点击手动刷新。若重复出现，联系作者修复。");
                 await dialog.ShowAsync();
             }
+        }
+
+        private void Refresh_Click(object sender, RoutedEventArgs e)
+        {
+            Refresh.Visibility = Visibility.Collapsed;
+            getLiveUri();
         }
     }
 }
