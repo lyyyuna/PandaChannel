@@ -8,7 +8,7 @@
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <MediaElement Name="pandaTVElement" />
+        <MediaElement Name="pandaTVElement"/>
         <Button Name="Refresh"
                 Click="Refresh_Click"
                 Visibility="Collapsed"

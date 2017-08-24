@@ -75,7 +75,7 @@ namespace PandaChannelUWP.Views
             item.Urls.Add("http://p1.img.cctvpic.com/photoAlbum/photo/2017/08/14/PHOTh3CKb5BcDQLKXlH8qPbk170814_920x700.jpg");
             photos.Add(item);*/
             var httpClient = new HttpClient();
-            var requestStr = "http://192.168.1.224:8000/news/photos?page="  + (pageIndex+1);
+            var requestStr = "http://pandachannel.lihulab.net/news/photos?page=" + (pageIndex+1);
             var requestUri = new Uri(requestStr);
 
             try
